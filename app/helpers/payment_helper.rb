@@ -14,14 +14,15 @@ module PaymentHelper
 		url = @server + '/oauth/token'
 
 		return HTTParty.post(url,
-			body: {
-				:grant_type => 'client_credentials&scope=api'
-			}.to_json,
 			headers: {
 				'Accept' => 'application/json',
-				'Content-Type' => 'application/hal+json',
+				'Content-Type' => 'application/x-www-form-urlencoded',
 				'Authorization' => authorization
-			}
+			},
+			body: {
+				:grant_type => 'client_credentials',
+				:scope => 'api'
+			}.to_query
 		)
 	end
 
