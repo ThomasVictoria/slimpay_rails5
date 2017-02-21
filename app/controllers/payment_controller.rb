@@ -1,7 +1,10 @@
 class PaymentController < ApplicationController
 
   def yolo
-  	@yolo = PaymentHelper.jesuisla
+
+  	puts PaymentHelper.getToken
+
+  	@yolo = 'The YOLO is real'
   end
 
 end
