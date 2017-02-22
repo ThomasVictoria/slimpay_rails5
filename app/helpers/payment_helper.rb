@@ -1,19 +1,17 @@
 module PaymentHelper
 
-	@appID = 'hbs0px5mh3xqbx2'
-	@appSecret = 'm4r7dxW6TdGqFvza~e~CrPvtqNc9'
-	@creditorReference = 'hbs0px5mh3xqbx2'
-
+	@app_id = 'hbs0px5mh3xqbx2'
+	@app_secret = 'm4r7dxW6TdGqFvza~e~CrPvtqNc9'
+	@creditor_reference = 'hbs0px5mh3xqbx2'
+  @token = String.new
 	@server = 'https://api-sandbox.slimpay.net'
 
-	private
-
-	def self.getToken
-		encodedKey = Base64.encode64(@appID+':'+@appSecret)
-		authorization = 'Basic ' + encodedKey
+  def self.get_token
+ 		encoded_key = Base64.encode64(@app_id+':'+@app_secret)
+		authorization = 'Basic ' + encoded_key
 		url = @server + '/oauth/token'
 
-		return HTTParty.post(url,
+		HTTParty.post(url,
 			headers: {
 				'Accept' => 'application/json',
 				'Content-Type' => 'application/x-www-form-urlencoded',
@@ -24,6 +22,33 @@ module PaymentHelper
 				:scope => 'api'
 			}.to_query
 		)
+  end
+
+  def self.get_links(token)
+    authorization = 'Bearer ' + token
+    order = HTTParty.get('https://api-sandbox.slimpay.net/',
+      headers: {
+				'Accept' => 'application/hal+json; profile="https://api.slimpay.net/alps/v1"',
+				'Content-Type' => 'application/json',
+				'Authorization' => authorization
+      }
+    )
 	end
+
+  def self.create_order(token, links)
+    authorization = 'Bearer ' + token
+    order = HTTParty.post(links["_links"]['https://api.slimpay.net/alps#create-orders']["href"],
+      headers: {
+        'Accept' => 'application/hal+json; profile="https://api.slimpay.net/alps/v1"',
+        'Content-Type' => 'application/json',
+        'Authorization' => authorization
+      },
+      body: {
+        creditor: {
+          reference: @creditor_reference
+        }
+      }.to_json
+    )
+  end
 
 end
