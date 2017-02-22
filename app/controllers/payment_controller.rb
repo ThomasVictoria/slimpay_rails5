@@ -6,6 +6,9 @@ class PaymentController < ApplicationController
     response = PaymentHelper.get_links(@token["access_token"])
     @links = JSON.parse(response.body)
     @order = PaymentHelper.create_order(@token["access_token"], @links)
+    @user = PaymentHelper.checkUser(@token['access_token'])
+    puts @user
+    puts '-------------------------------------------------------------------'
     puts @order
   end
 

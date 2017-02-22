@@ -44,11 +44,60 @@ module PaymentHelper
         'Authorization' => authorization
       },
       body: {
+      	started: true,
         creditor: {
           reference: @creditor_reference
+        },
+        subscriber: {
+        	reference: 'user1'
+        },
+        items: [
+        	{
+        		type: "signMandate",
+        		autoGenReference: true,
+        		mandate: {
+        			signatory: {
+        				billingAddress: {
+        					street1: "9 place",
+        					street2: "Jean Jaurès",
+        					city: 'Paris',
+        					postalCode: '93100',
+        					country: 'FR'
+        				},
+        				honorificPrefix: 'Mr',
+        				givenName: 'Doe',
+        				familyName: 'John',
+	                    email: "change.me@slimpay.com",
+	                    telephone: '+33631772046'
+        			},
+        			standard: 'SEPA'
+        		}
+        	},
+        	{
+            type: "recurrentDirectDebit",
+            recurrentDirectDebit: {
+                amount: "192",
+                label: "This is my Recurrent Direct Debit",
+                frequency: "monthly",
+                maxSddNumber: "5",
+                activated: true,
+                dateFrom: "2017-11-04T13:11:52.900+0000"
+            }
         }
+        ]
       }.to_json
     )
+  end
+
+  def self.checkUser(token)
+  	authorization = 'Bearer ' + token
+  	HTTParty.get('https://api-sandbox.slimpay.net/orders/0aba5db6-f904-11e6-8d7f-000000000000',
+		headers: {
+	        'Accept' => 'application/hal+json; profile="https://api.slimpay.net/alps/v1"',
+	        'Content-Type' => 'application/json',
+	        'Authorization' => authorization
+     		}
+  		)
   end
 
 end
